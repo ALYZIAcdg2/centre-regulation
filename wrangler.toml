@@ -1,0 +1,14 @@
+
+name = "centre-regulation"
+main = "worker.js"
+compatibility_date = "2026-08-05"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "centre-regulation-db"
+database_id = "acdfc192-8a23-47bc-9906-eae1b9900183"
+migrations_dir = "migrations"
