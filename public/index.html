@@ -39,11 +39,69 @@
     .save-status strong{display:block;margin:3px 0;color:#fff;font-size:12px}
     .update-app-btn{background:#fff!important;color:#123b63!important;border-color:#fff!important;box-shadow:0 5px 16px #001b3433}
     .update-app-btn[disabled]{opacity:.65;cursor:wait}
+    
+    /* VERSION COMPACTE : réduit le scroll vertical */
+    header{padding:14px 18px}
+    main{max-width:1320px;margin:-18px auto 26px;padding:0 16px}
+    .shell{border-radius:14px}
+    nav{padding:8px}
+    nav button{padding:10px 15px;border-radius:9px}
+    section{padding:16px}
+    .section-head{margin-bottom:12px;gap:12px}
+    .section-head h2{font-size:18px;margin:0 0 3px}
+    .section-head p{font-size:13px}
+    .actions{gap:7px}
+    .btn{padding:8px 12px;border-radius:8px}
+    .cards{gap:10px;margin:0 0 14px}
+    .card{padding:11px}
+    .card strong{font-size:22px;margin-top:3px}
+    .action-meta{margin:6px 0 12px;font-size:11px;gap:12px}
+    .table-wrap table th{padding:9px 10px}
+    .table-wrap table td{padding:8px 10px}
+    input,select,textarea{padding:8px;border-radius:7px}
+    .date-nav .btn{height:38px;min-width:48px}
+    .empty{padding:22px}
+    .dialog-head{padding:15px 18px}
+    .dialog-body{padding:16px;gap:12px}
+    .dialog-actions{padding:0 16px 16px}
+    .report-meta{gap:10px;margin-bottom:12px}
+    .shift-grid{margin-bottom:12px}
+    .shift{padding:10px}
+    .rubrics{gap:10px}
+    .rubric{padding:12px}
+    .rubric textarea{min-height:72px}
+    .email-panel{margin-top:12px;padding:12px}
+    .image-paste-zone{min-height:84px;padding:10px}
+    .summary-images{gap:10px;margin-top:10px}
+    .summary-image img{height:118px}
+    .summary-box{padding:14px}
+    .header-main{gap:14px}
+    .header-tools{gap:8px}
+    .save-status{min-width:200px;padding:8px 10px}
+    .save-status strong{font-size:11px}
+    .update-app-btn.icon-only{
+      width:44px;
+      min-width:44px;
+      height:44px;
+      padding:0!important;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+    }
+    .update-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px}
+    .update-icon svg{width:22px;height:22px;display:block}
+
     @media(max-width:800px){
       .header-main{align-items:flex-start;flex-direction:column}
       .header-tools{width:100%;justify-content:stretch}
       .save-status{flex:1;text-align:left;min-width:190px}
-      .update-app-btn{flex:1;min-height:46px}
+      .update-app-btn{flex:1;min-height:42px}
+      .update-app-btn.icon-only{flex:0 0 44px;min-height:44px}
+      section{padding:12px}
+      .cards{grid-template-columns:repeat(2,1fr)}
+      .section-head{margin-bottom:10px}
+      .header-tools{justify-content:flex-start}
     }
 
     @media(max-width:800px){.cards{grid-template-columns:1fr 1fr}.section-head{flex-direction:column}.grid2,.report-meta{grid-template-columns:1fr}.shift-grid{grid-template-columns:1fr}.shift{border-right:0;border-bottom:1px solid var(--line)}.incident-row{grid-template-columns:1fr 1fr}.incident-row input:nth-child(3){grid-column:1/-1}section{padding:17px}.load-table{min-width:700px}}
@@ -64,7 +122,13 @@
         <small>TOUTES LES 5 MINUTES</small>
       </div>
       <input id="appUpdateFile" type="file" accept=".html,text/html" hidden>
-      <button class="btn update-app-btn" type="button" onclick="openAppUpdate()">METTRE À JOUR L’APPLICATION</button>
+      <button class="btn update-app-btn icon-only" type="button" onclick="openAppUpdate()" title="METTRE À JOUR L’APPLICATION" aria-label="METTRE À JOUR L’APPLICATION">
+        <span class="update-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 16V5M12 5L8.5 8.5M12 5L15.5 8.5M5 16.5V18C5 19.1046 5.89543 20 7 20H17C18.1046 20 19 19.1046 19 18V16.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
     </div>
   </div>
 </header>
@@ -697,19 +761,9 @@ async function submitAppUpdate(){
       },
       body:content
     });
-    let result={},rawResponse='';
-    try{
-      rawResponse=await response.text();
-      result=rawResponse?JSON.parse(rawResponse):{};
-    }catch(_){
-      result={};
-    }
-    if(!response.ok){
-      throw new Error(
-        (result.error||rawResponse||'LA MISE À JOUR A ÉTÉ REFUSÉE PAR LE SERVEUR.')+
-        ' (HTTP '+response.status+')'
-      );
-    }
+    let result={};
+    try{result=await response.json()}catch(_){}
+    if(!response.ok)throw new Error(result.error||'LA MISE À JOUR A ÉTÉ REFUSÉE PAR LE SERVEUR.');
     localAutoSave('AVANT MISE À JOUR APPLICATION');
     updateAppDialog.close();
     showNotice('LA NOUVELLE VERSION EST INSTALLÉE. LA PAGE VA ÊTRE ACTUALISÉE.','MISE À JOUR TERMINÉE');
