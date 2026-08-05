@@ -182,7 +182,7 @@ state.summaryData=state.summaryData||freshSummary();
 state.summaryData.images=Array.isArray(state.summaryData.images)?state.summaryData.images:[];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // SAISIE GÉNÉRALE EN MAJUSCULES
-document.addEventListener('input',event=>{let el=event.target;if(!el||!['INPUT','TEXTAREA'].includes(el.tagName))return;let type=(el.type||'text').toLowerCase();if(['date','file','number','range','checkbox','radio'].includes(type)||el.classList.contains('absence-hours'))return;let start=el.selectionStart,end=el.selectionEnd,upper=el.value.toUpperCase();if(el.value!==upper){el.value=upper;try{el.setSelectionRange(start,end)}catch(_){}}},true);
+document.addEventListener('input',event=>{let el=event.target;if(!el||!['INPUT','TEXTAREA'].includes(el.tagName))return;let type=(el.type||'text').toLowerCase();if(['date','file','number','range','checkbox','radio','password'].includes(type)||el.classList.contains('absence-hours'))return;let start=el.selectionStart,end=el.selectionEnd,upper=el.value.toUpperCase();if(el.value!==upper){el.value=upper;try{el.setSelectionRange(start,end)}catch(_){}}},true);
 function formatHoursDigits(value){let d=String(value||'').replace(/\D/g,'').slice(0,8);if(d.length<=2)return d;if(d.length<=4)return d.slice(0,2)+'H'+d.slice(2);if(d.length<=6)return d.slice(0,2)+'H'+d.slice(2,4)+' - '+d.slice(4);return d.slice(0,2)+'H'+d.slice(2,4)+' - '+d.slice(4,6)+'H'+d.slice(6);}
 function updateAbsenceHours(input,index){input.value=formatHoursDigits(input.value);state.absences[index].horaires=input.value;}
 function formatNewAbsenceHours(input){input.value=formatHoursDigits(input.value);}
@@ -697,9 +697,19 @@ async function submitAppUpdate(){
       },
       body:content
     });
-    let result={};
-    try{result=await response.json()}catch(_){}
-    if(!response.ok)throw new Error(result.error||'LA MISE À JOUR A ÉTÉ REFUSÉE PAR LE SERVEUR.');
+    let result={},rawResponse='';
+    try{
+      rawResponse=await response.text();
+      result=rawResponse?JSON.parse(rawResponse):{};
+    }catch(_){
+      result={};
+    }
+    if(!response.ok){
+      throw new Error(
+        (result.error||rawResponse||'LA MISE À JOUR A ÉTÉ REFUSÉE PAR LE SERVEUR.')+
+        ' (HTTP '+response.status+')'
+      );
+    }
     localAutoSave('AVANT MISE À JOUR APPLICATION');
     updateAppDialog.close();
     showNotice('LA NOUVELLE VERSION EST INSTALLÉE. LA PAGE VA ÊTRE ACTUALISÉE.','MISE À JOUR TERMINÉE');
